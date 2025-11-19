@@ -12,7 +12,7 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 
 # Example schemas (replace with your own):
 
@@ -38,11 +38,36 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Community app schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+TopicType = Literal[
+    "Perimenopause",
+    "Menopause",
+    "Post-menopause",
+    "Mental Health",
+    "Nutrition",
+    "Sleep",
+    "Fitness",
+    "Relationships",
+    "Caregiving",
+]
+
+class Post(BaseModel):
+    """
+    Community posts created by members
+    Collection: "post"
+    """
+    display_name: str = Field(..., min_length=2, max_length=60, description="Name to show with the post")
+    title: str = Field(..., min_length=3, max_length=120)
+    content: str = Field(..., min_length=8, max_length=5000)
+    topic: TopicType
+    likes: int = Field(0, ge=0)
+
+class Comment(BaseModel):
+    """
+    Comments on posts
+    Collection: "comment"
+    """
+    post_id: str = Field(..., description="Associated post id")
+    display_name: str = Field(..., min_length=2, max_length=60)
+    content: str = Field(..., min_length=2, max_length=2000)
